@@ -50,7 +50,6 @@ import { tasksProvider } from "./providers/tasksProvider";
 import { permissionProvider } from "./providers/permissionProvider";
 import { AssignRole, ListUsersWithRoles, RemoveRole } from "./pages/roles";
 import { useNotificationProvider } from "./components/notification";
-import { LoginCheck } from "./pages/check";
 
 function App() {
   return (

@@ -3,6 +3,7 @@ import type { AuthProvider } from "@refinedev/core";
 import { Configuration, FrontendApi } from "@ory/kratos-client";
 import { request } from "@/utils/request";
 import { fetchPermission } from "@/access-control-provider";
+import { bodyCheckPermission } from "@/stores/permission";
 
 export const TOKEN_KEY = "partner-auth";
 
@@ -226,9 +227,10 @@ export const authProvider: AuthProvider = {
     const raw = localStorage.getItem(TOKEN_KEY);
 
     if (raw) {
-      const response = await request(
-        `/api/statistics/volumes/onramp?interval=day`
-      );
+      const response = await request(`/api/permissions`, {
+        method: "POST",
+        body: JSON.stringify(bodyCheckPermission),
+      });
       if (!response.ok) {
         if (response.status === 401) {
           localStorage.removeItem(TOKEN_KEY);
