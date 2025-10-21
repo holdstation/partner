@@ -151,24 +151,23 @@ export const authProvider: AuthProvider = {
     // console.log(11, flow);
     const url = flow.ui.action;
     // const method = flow.ui.method;
-    submitForm(url,csrf_token,email,password )
-   
+    // submitForm(url,csrf_token,email,password )
+    const form = new FormData();
+    form.set("csrf_token", csrf_token);
+    form.set("identifier", "huyvx@holdstation.com");
+    form.set("password", "huy@1234");
+    form.set("method", "password");
+
     // submitForm(flow.ui.action, csrf_token, email,password);
 
-    // const response = await fetch(url, {
-    //   method: method,
-    //   body: JSON.stringify({
-    //     traits: {
-    //       email: email,
-    //       password: password,
-    //     },
-    //     csrf_token: csrf_token,
-    //     method: methodResponse,
-    //   }),
-    //   credentials: "include",
-    // });
+    const response = await fetch(url, {
+      method: "POST",
+      body: form,
+    });
+    console.log("huyvx response", response);
 
-    // const data = await response.json();
+    const data = await response.json();
+    console.log("huyvx", data);
     // localStorage.setItem("auth-login", JSON.stringify(data));
 
     return {
