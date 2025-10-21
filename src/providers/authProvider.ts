@@ -143,7 +143,7 @@ export function submitOAuthForm(
 }
 
 export const authProvider: AuthProvider = {
-  login: async ({ email }) => {
+  login: async ({ email, password }) => {
     const flow = await getOrCreateFlow();
     // const url = flow.ui.action;
     const { csrf_token, method: methodResponse } = extractMethodAndCsrf(flow);
@@ -153,14 +153,15 @@ export const authProvider: AuthProvider = {
 
     const response = await fetch(url, {
       method: method,
-
       body: JSON.stringify({
         traits: {
           email: email,
+          password: password,
         },
         csrf_token: csrf_token,
         method: methodResponse,
       }),
+      credentials: "include",
     });
 
     const data = await response.json();
