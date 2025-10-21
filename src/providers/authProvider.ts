@@ -150,7 +150,7 @@ export const authProvider: AuthProvider = {
         csrf_token: csrf_token,
         identifier: email,
         password: password,
-        method: password,
+        method: "password",
       }),
     });
 
