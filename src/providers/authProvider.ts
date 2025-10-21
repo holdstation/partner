@@ -146,36 +146,42 @@ export function submitForm(
 export const authProvider: AuthProvider = {
   login: async ({ email, password }) => {
     const flow = await getOrCreateFlow();
-    // const url = flow.ui.action;
     const { csrf_token } = extractMethodAndCsrf(flow);
-    // console.log(11, flow);
     const url = flow.ui.action;
-    // const method = flow.ui.method;
-    submitForm(url,csrf_token,email,password )
-    // const form = new FormData();
-    // form.set("csrf_token", csrf_token);
-    // form.set("identifier", "huyvx@holdstation.com");
-    // form.set("password", "huy@1234");
-    // form.set("method", "password");
+
+    const form = new FormData();
+    form.set("csrf_token", csrf_token);
+    form.set("identifier", email);
+    form.set("password", password);
+    form.set("method", "password");
 
     // // submitForm(flow.ui.action, csrf_token, email,password);
 
-    // const response = await fetch(url, {
-    //   method: "POST",
-    //   body: form,
-    // });
-    // console.log("huyvx response", response);
+    await fetch(url, {
+      method: "POST",
+      body: form,
+    });
 
-    
-    // localStorage.setItem("auth-login", JSON.stringify(data));
+    const sessionUrl = `${BASE_API}/sessions/whoami?tokenize_as=jwt`;
 
-    return {
-      success: false,
-      error: {
-        name: "Invalid credentials",
-        message: "Login Error",
+    const response = await fetch(sessionUrl, {
+      method: "GET",
+      credentials: "include",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
       },
-    };
+    });
+
+    if (response.ok) {
+      const sessionData = await response.json();
+      localStorage.setItem(TOKEN_KEY, JSON.stringify(sessionData));
+
+      return {
+        success: true,
+        redirectTo: "/",
+      };
+    }
 
     return {
       success: false,
