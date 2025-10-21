@@ -74,7 +74,7 @@ type KratosFlow = {
 };
 
 function extractMethodAndCsrf(flow: KratosFlow) {
-  let csrf_token: string | undefined;
+  let csrf_token: string ="";
   let method: string | undefined;
 
   for (const node of flow.ui.nodes) {
@@ -82,7 +82,7 @@ function extractMethodAndCsrf(flow: KratosFlow) {
 
     // lấy csrf_token
     if (name === "csrf_token") {
-      csrf_token = value;
+      csrf_token = value||'';
     }
 
     // lấy method (submit button có type=submit)
@@ -91,7 +91,7 @@ function extractMethodAndCsrf(flow: KratosFlow) {
     }
   }
 
-  return { method, csrf_token };
+  return { method, csrf_token:csrf_token };
 }
 
 /**
@@ -103,6 +103,57 @@ function extractMethodAndCsrf(flow: KratosFlow) {
  * @param provider - OAuth provider (always 'google' in our case)
  */
 export function submitOAuthForm(
+  action: string,
+  csrfToken: string,
+  email:string,
+): void {
+  const form = document.createElement("form");
+
+  form.method = "POST";
+  form.action = action;
+
+
+ // Add CSRF token
+ const emailInput = document.createElement("input");
+
+ emailInput.type = "email";
+ emailInput.name = "traits.email";
+ emailInput.value = email;
+ form.appendChild(emailInput);
+
+
+  // Add CSRF token
+  const csrfInput = document.createElement("input");
+
+  csrfInput.type = "hidden";
+  csrfInput.name = "csrf_token";
+  csrfInput.value = csrfToken;
+  form.appendChild(csrfInput);
+
+  // Add provider
+  // const providerInput = document.createElement("input");
+
+  // providerInput.type = "hidden";
+  // providerInput.name = "provider";
+  // providerInput.value = provider;
+  // form.appendChild(providerInput);
+
+  // Add return_to URL to ensure proper redirect back to localhost callback
+  // const returnToInput = document.createElement("input");
+
+  // returnToInput.type = "hidden";
+  // returnToInput.name = "return_to";
+  // returnToInput.value = window.location.origin + "/auth/callback";
+  // form.appendChild(returnToInput);
+
+  // Submit form
+  document.body.appendChild(form);
+  form.submit();
+  document.body.removeChild(form);
+}
+
+
+export function submitForm(
   action: string,
   csrfToken: string,
   provider: string = "microsoft"
@@ -143,29 +194,31 @@ export function submitOAuthForm(
 }
 
 export const authProvider: AuthProvider = {
-  login: async ({ email, password }) => {
+  login: async ({ email }) => {
     const flow = await getOrCreateFlow();
     // const url = flow.ui.action;
-    const { csrf_token, method: methodResponse } = extractMethodAndCsrf(flow);
-    console.log(11, flow);
-    const url = flow.ui.action;
-    const method = flow.ui.method;
+    const { csrf_token} = extractMethodAndCsrf(flow);
+    // console.log(11, flow);
+    // const url = flow.ui.action;
+    // const method = flow.ui.method;
 
-    const response = await fetch(url, {
-      method: method,
-      body: JSON.stringify({
-        traits: {
-          email: email,
-          password: password,
-        },
-        csrf_token: csrf_token,
-        method: methodResponse,
-      }),
-      credentials: "include",
-    });
+    submitForm(flow.ui.action, csrf_token, email);
 
-    const data = await response.json();
-    localStorage.setItem("auth-login", JSON.stringify(data));
+    // const response = await fetch(url, {
+    //   method: method,
+    //   body: JSON.stringify({
+    //     traits: {
+    //       email: email,
+    //       password: password,
+    //     },
+    //     csrf_token: csrf_token,
+    //     method: methodResponse,
+    //   }),
+    //   credentials: "include",
+    // });
+
+    // const data = await response.json();
+    // localStorage.setItem("auth-login", JSON.stringify(data));
 
     return {
       success: false,
