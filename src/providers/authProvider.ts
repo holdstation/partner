@@ -106,10 +106,18 @@ export function submitForm(
   form.action = action;
 
   // Add CSRF token
+  const csrfInput = document.createElement("input");
+
+  csrfInput.type = "hidden";
+  csrfInput.name = "csrf_token";
+  csrfInput.value = csrfToken;
+  form.appendChild(csrfInput);
+
+  // Add CSRF token
   const emailInput = document.createElement("input");
 
-  emailInput.type = "email";
-  emailInput.name = "traits.email";
+  emailInput.type = "text";
+  emailInput.name = "identifier";
   emailInput.value = email;
   form.appendChild(emailInput);
 
@@ -117,17 +125,17 @@ export function submitForm(
   const passwordInput = document.createElement("input");
 
   passwordInput.type = "password";
-  passwordInput.name = "traits.password";
+  passwordInput.name = "password";
   passwordInput.value = password;
   form.appendChild(passwordInput);
 
   // Add CSRF token
-  const csrfInput = document.createElement("input");
+  const methodInput = document.createElement("input");
 
-  csrfInput.type = "hidden";
-  csrfInput.name = "csrf_token";
-  csrfInput.value = csrfToken;
-  form.appendChild(csrfInput);
+  methodInput.type = "submit";
+  methodInput.name = "method";
+  methodInput.value = "password";
+  form.appendChild(methodInput);
 
   // Submit form
   document.body.appendChild(form);
@@ -143,19 +151,8 @@ export const authProvider: AuthProvider = {
     // console.log(11, flow);
     const url = flow.ui.action;
     // const method = flow.ui.method;
-
-    const response = await fetch(url, {
-      method: "POST",
-      body: JSON.stringify({
-        csrf_token: csrf_token,
-        identifier: email,
-        password: password,
-        method: "password",
-      }),
-    });
-
-    const data = await response.json();
-    console.log('huyvx',data)
+    submitForm(url,csrf_token,email,password )
+   
     // submitForm(flow.ui.action, csrf_token, email,password);
 
     // const response = await fetch(url, {
