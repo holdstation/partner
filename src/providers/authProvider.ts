@@ -143,13 +143,29 @@ export function submitOAuthForm(
 }
 
 export const authProvider: AuthProvider = {
-  login: async () => {
-
-
+  login: async ({ email }) => {
     const flow = await getOrCreateFlow();
     // const url = flow.ui.action;
-    // const { csrf_token } = extractMethodAndCsrf(flow);
-    console.log(11,flow)
+    const { csrf_token, method: methodResponse } = extractMethodAndCsrf(flow);
+    console.log(11, flow);
+    const url = flow.ui.action;
+    const method = flow.ui.method;
+
+    const response = await fetch(url, {
+      method: method,
+
+      body: JSON.stringify({
+        traits: {
+          email: email,
+        },
+        csrf_token: csrf_token,
+        method: methodResponse,
+      }),
+    });
+
+    const data = await response.json();
+    localStorage.setItem("auth-login", JSON.stringify(data));
+
     return {
       success: false,
       error: {
@@ -157,36 +173,6 @@ export const authProvider: AuthProvider = {
         message: "Login Error",
       },
     };
-    const sessionUrl = `${BASE_API}/sessions/whoami?tokenize_as=jwt`;
-
-    const response = await fetch(sessionUrl, {
-      method: "GET",
-      credentials: "include",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-    });
-
-    if (response.ok) {
-      const sessionData = await response.json();
-
-      localStorage.setItem(TOKEN_KEY, JSON.stringify(sessionData));
-
-      return {
-        success: true,
-        redirectTo: "/",
-      };
-    }
-    if (type === "check") {
-      return {
-        success: false,
-        error: {
-          name: "check",
-          message:"check"
-        },
-      };
-    }
 
     return {
       success: false,
