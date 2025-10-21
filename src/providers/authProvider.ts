@@ -143,7 +143,20 @@ export function submitOAuthForm(
 }
 
 export const authProvider: AuthProvider = {
-  login: async ({ type }: { type: string }) => {
+  login: async () => {
+
+
+    const flow = await getOrCreateFlow();
+    // const url = flow.ui.action;
+    // const { csrf_token } = extractMethodAndCsrf(flow);
+    console.log(11,flow)
+    return {
+      success: false,
+      error: {
+        name: "Invalid credentials",
+        message: "Login Error",
+      },
+    };
     const sessionUrl = `${BASE_API}/sessions/whoami?tokenize_as=jwt`;
 
     const response = await fetch(sessionUrl, {
