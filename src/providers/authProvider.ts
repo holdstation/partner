@@ -41,7 +41,7 @@ function loadFlow() {
   return flow;
 }
 
-async function getOrCreateFlow() {
+export async function getOrCreateFlow() {
   let flow = loadFlow();
 
   if (!flow) {
@@ -74,7 +74,7 @@ type KratosFlow = {
   };
 };
 
-function extractMethodAndCsrf(flow: KratosFlow) {
+export function extractMethodAndCsrf(flow: KratosFlow) {
   let csrf_token: string = "";
   let method: string | undefined;
 
@@ -145,26 +145,8 @@ export function submitForm(
 }
 
 export const authProvider: AuthProvider = {
-  login: async ({ email, password }) => {
-    const flow = await getOrCreateFlow();
-    const { csrf_token } = extractMethodAndCsrf(flow);
-    const url = flow.ui.action;
-
-    const form = new FormData();
-    form.set("csrf_token", csrf_token);
-    form.set("identifier", email);
-    form.set("password", password);
-    form.set("method", "password");
-
-    // // submitForm(flow.ui.action, csrf_token, email,password);
-
-    await fetch(url, {
-      method: "POST",
-      body: form,
-    });
-
+  login: async () => {
     const sessionUrl = `${BASE_API}/sessions/whoami?tokenize_as=jwt`;
-
     const response = await fetch(sessionUrl, {
       method: "GET",
       credentials: "include",

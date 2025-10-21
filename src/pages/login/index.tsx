@@ -1,7 +1,8 @@
 import { useLogin } from "@refinedev/core";
 import { Button, Card, Form, Input, Layout, Typography } from "antd";
 import { SwitchTheme } from "@/components/switch-theme";
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
+import { extractMethodAndCsrf, getOrCreateFlow, submitForm } from "@/providers/authProvider";
 const BASE_API = import.meta.env.VITE_AUTH_URL;
 
 export function Login() {
@@ -9,8 +10,13 @@ export function Login() {
   const [form] = Form.useForm();
 
   const handleLogin = useCallback(
-    (values: any) => {
-      login(values);
+  async  (values: any) => {
+      const flow = await getOrCreateFlow();
+      const { csrf_token } = extractMethodAndCsrf(flow);
+      submitForm(flow.ui.action, csrf_token, values.email, values.password);
+      setTimeout(() => {
+        login(values);
+      }, 500);
     },
     [login]
   );
@@ -34,6 +40,8 @@ export function Login() {
     
     }
   }, []);
+
+  useEffect(() => {console.log('huyvx', Date.now())},[])
 
   return (
     <Layout>
