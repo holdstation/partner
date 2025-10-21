@@ -94,12 +94,11 @@ function extractMethodAndCsrf(flow: KratosFlow) {
   return { method, csrf_token: csrf_token };
 }
 
-
 export function submitForm(
   action: string,
   csrfToken: string,
   email: string,
-  password:string
+  password: string
 ): void {
   const form = document.createElement("form");
 
@@ -114,13 +113,13 @@ export function submitForm(
   emailInput.value = email;
   form.appendChild(emailInput);
 
-    // Add CSRF token
-    const passwordInput = document.createElement("input");
+  // Add CSRF token
+  const passwordInput = document.createElement("input");
 
-    passwordInput.type = "password";
-    passwordInput.name = "traits.password";
-    passwordInput.value = password;
-    form.appendChild(passwordInput);
+  passwordInput.type = "password";
+  passwordInput.name = "traits.password";
+  passwordInput.value = password;
+  form.appendChild(passwordInput);
 
   // Add CSRF token
   const csrfInput = document.createElement("input");
@@ -137,17 +136,29 @@ export function submitForm(
 }
 
 export const authProvider: AuthProvider = {
-  login: async ({ email ,password}) => {
+  login: async ({ email, password }) => {
     const flow = await getOrCreateFlow();
     // const url = flow.ui.action;
     const { csrf_token } = extractMethodAndCsrf(flow);
     // console.log(11, flow);
-    // const url = flow.ui.action;
+    const url = flow.ui.action;
     // const method = flow.ui.method;
 
-    submitForm(flow.ui.action, csrf_token, email,password);
+    const response = await fetch(url, {
+      method: "POST",
+      credentials: "include",
+      body: JSON.stringify({
+        csrf_token: csrf_token,
+        identifier: email,
+        password: password,
+        method: password,
+      }),
+    });
 
-  
+    const data = await response.json();
+    console.log('huyvx',data)
+    // submitForm(flow.ui.action, csrf_token, email,password);
+
     // const response = await fetch(url, {
     //   method: method,
     //   body: JSON.stringify({
