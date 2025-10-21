@@ -146,7 +146,6 @@ export const authProvider: AuthProvider = {
 
     const response = await fetch(url, {
       method: "POST",
-      credentials: "include",
       body: JSON.stringify({
         csrf_token: csrf_token,
         identifier: email,
