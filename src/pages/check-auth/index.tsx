@@ -1,21 +1,13 @@
 import { useLogin } from "@refinedev/core";
-import { Spin } from "antd";
 import { useEffect } from "react";
+import { Outlet } from "react-router";
 
 export function AuthCallback() {
-  const { mutateAsync } = useLogin();
+  const { mutate } = useLogin();
 
   useEffect(() => {
-    mutateAsync({})
-      .then((e) => {
-        console.log("Login:", e);
-      })
-      .catch((err) => console.log("err:", err));
-  }, [mutateAsync]);
+    mutate({ type: "check" });
+  }, [mutate]);
 
-  return (
-    <div className="w-screen h-screen flex items-center justify-center">
-      <Spin />
-    </div>
-  );
+  return <Outlet />;
 }

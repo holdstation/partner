@@ -145,18 +145,22 @@ export function submitForm(
 }
 
 export const authProvider: AuthProvider = {
-  login: async () => {
-    const sessionUrl = `${BASE_API}/sessions/whoami?tokenize_as=jwt`;
-    const response = await fetch(sessionUrl, {
-      method: "GET",
-      credentials: "include",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-    });
+  login: async ({ type }) => {
+    try {
+      const sessionUrl = `${BASE_API}/sessions/whoami?tokenize_as=jwt`;
 
-    if (response.ok) {
+      const response = await fetch(sessionUrl, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      });
+      if (!response.ok) {
+        throw new Error("Error");
+
+      }
       const sessionData = await response.json();
       localStorage.setItem(TOKEN_KEY, JSON.stringify(sessionData));
 
@@ -164,6 +168,18 @@ export const authProvider: AuthProvider = {
         success: true,
         redirectTo: "/",
       };
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (error:any) {
+      if(type === 'check'){
+        return {
+          success: false,
+          error: {
+            name: "check",
+            message: "check",
+          },
+        };
+      }
+   
     }
 
     return {
@@ -209,6 +225,9 @@ export const authProvider: AuthProvider = {
     const raw = localStorage.getItem(TOKEN_KEY);
 
     if (raw) {
+      return {
+        authenticated: true,
+      };
       const response = await request(`/api/permissions`, {
         method: "POST",
         body: JSON.stringify(bodyCheckPermission),

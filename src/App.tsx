@@ -1,4 +1,4 @@
-import { Outlet, Route, Routes } from "react-router";
+import { Route, Routes } from "react-router";
 import { Authenticated, Refine } from "@refinedev/core";
 import routerProvider, {
   CatchAllNavigate,
@@ -224,14 +224,15 @@ function App() {
             </Route>
             <Route
               element={
-                <Authenticated key="authenticated-outer" fallback={<Outlet />}>
+                <Authenticated
+                  key="authenticated-outer"
+                  fallback={<AuthCallback />}
+                >
                   <NavigateToResource />
                 </Authenticated>
               }
             >
               <Route element={<Login />} path="/signin" />
-              <Route element={<AuthCallback />} path="/auth/callback" />
-              <Route element={<AuthCallback />} path="/auth/register" />
             </Route>
           </Routes>
 
