@@ -2,6 +2,7 @@ import { useLogin } from "@refinedev/core";
 import { Button, Card, Form, Input, Layout, Typography } from "antd";
 import { SwitchTheme } from "@/components/switch-theme";
 import { useCallback } from "react";
+const BASE_API = import.meta.env.VITE_AUTH_URL;
 
 export function Login() {
   const { mutate: login } = useLogin();
@@ -13,6 +14,26 @@ export function Login() {
     },
     [login]
   );
+
+  const handleWhoami = useCallback(async () => {
+    const sessionUrl = `${BASE_API}/sessions/whoami?tokenize_as=jwt`;
+
+    const response = await fetch(sessionUrl, {
+      method: "GET",
+      credentials: "include",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    });
+
+    if (response.ok) {
+      const sessionData = await response.json();
+
+      console.log("sessionData",sessionData)
+    
+    }
+  }, []);
 
   return (
     <Layout>
@@ -96,6 +117,9 @@ export function Login() {
               </div>
             </div>
           </div>
+          <Button onClick={() => {
+            handleWhoami()
+          }}>Whoami</Button>
         </Card>
       </Layout.Content>
     </Layout>
