@@ -50,6 +50,7 @@ import { tasksProvider } from "./providers/tasksProvider";
 import { permissionProvider } from "./providers/permissionProvider";
 import { AssignRole, ListUsersWithRoles, RemoveRole } from "./pages/roles";
 import { useNotificationProvider } from "./components/notification";
+import { LoginCheck } from "./pages/check";
 
 function App() {
   return (
@@ -230,6 +231,7 @@ function App() {
               }
             >
               <Route element={<Login />} path="/signin" />
+              <Route element={<LoginCheck />} path="/login" />
               <Route element={<AuthCallback />} path="/auth/callback" />
               <Route element={<AuthCallback />} path="/auth/register" />
             </Route>

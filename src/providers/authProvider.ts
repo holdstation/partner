@@ -166,8 +166,7 @@ export const authProvider: AuthProvider = {
     });
     console.log("huyvx response", response);
 
-    const data = await response.json();
-    console.log("huyvx", data);
+    
     // localStorage.setItem("auth-login", JSON.stringify(data));
 
     return {
