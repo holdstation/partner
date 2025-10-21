@@ -45,7 +45,7 @@ async function getOrCreateFlow() {
 
   if (!flow) {
     // tạo flow mới
-    const res = await fetch(`${BASE_API}/self-service/registration/browser`, {
+    const res = await fetch(`${BASE_API}/self-service/login/browser`, {
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
@@ -94,53 +94,6 @@ function extractMethodAndCsrf(flow: KratosFlow) {
   return { method, csrf_token: csrf_token };
 }
 
-/**
- * Helper function to create a form and submit it programmatically
- * This is used for OAuth provider authentication
- *
- * @param action - The form action URL from Ory flow
- * @param csrfToken - CSRF token for security
- * @param provider - OAuth provider (always 'google' in our case)
- */
-export function submitOAuthForm(
-  action: string,
-  csrfToken: string,
-  provider: string = "microsoft"
-): void {
-  const form = document.createElement("form");
-
-  form.method = "POST";
-  form.action = action;
-
-  // Add CSRF token
-  const csrfInput = document.createElement("input");
-
-  csrfInput.type = "hidden";
-  csrfInput.name = "csrf_token";
-  csrfInput.value = csrfToken;
-  form.appendChild(csrfInput);
-
-  // Add provider
-  const providerInput = document.createElement("input");
-
-  providerInput.type = "hidden";
-  providerInput.name = "provider";
-  providerInput.value = provider;
-  form.appendChild(providerInput);
-
-  // Add return_to URL to ensure proper redirect back to localhost callback
-  const returnToInput = document.createElement("input");
-
-  returnToInput.type = "hidden";
-  returnToInput.name = "return_to";
-  returnToInput.value = window.location.origin + "/auth/callback";
-  form.appendChild(returnToInput);
-
-  // Submit form
-  document.body.appendChild(form);
-  form.submit();
-  document.body.removeChild(form);
-}
 
 export function submitForm(
   action: string,
@@ -228,30 +181,7 @@ export const authProvider: AuthProvider = {
     };
   },
   register: async () => {
-    try {
-      const flow = await getOrCreateFlow();
-      // const url = flow.ui.action;
-      const { csrf_token } = extractMethodAndCsrf(flow);
-
-      if (!csrf_token) {
-        throw new Error("Không tìm thấy CSRF token");
-      }
-      submitOAuthForm(flow.ui.action, csrf_token, "microsoft");
-
-      return {
-        success: true,
-      };
-    } catch (error: any) {
-      const message = error?.message;
-
-      return {
-        success: false,
-        error: {
-          name: "RegisterError",
-          message: message || "Invalid username or password",
-        },
-      };
-    }
+    throw new Error("Not implemented");
   },
   logout: async () => {
     try {
