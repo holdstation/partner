@@ -1,9 +1,6 @@
 import type { AuthProvider } from "@refinedev/core";
 
 import { Configuration, FrontendApi } from "@ory/kratos-client";
-import { request } from "@/utils/request";
-import { fetchPermission } from "@/access-control-provider";
-import { bodyCheckPermission } from "@/stores/permission";
 
 export const TOKEN_KEY = "partner-auth";
 
@@ -159,7 +156,6 @@ export const authProvider: AuthProvider = {
       });
       if (!response.ok) {
         throw new Error("Error");
-
       }
       const sessionData = await response.json();
       localStorage.setItem(TOKEN_KEY, JSON.stringify(sessionData));
@@ -168,9 +164,9 @@ export const authProvider: AuthProvider = {
         success: true,
         redirectTo: "/",
       };
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    } catch (error:any) {
-      if(type === 'check'){
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (error: any) {
+      if (type === "check") {
         return {
           success: false,
           error: {
@@ -179,7 +175,6 @@ export const authProvider: AuthProvider = {
           },
         };
       }
-   
     }
 
     return {
@@ -228,31 +223,6 @@ export const authProvider: AuthProvider = {
       return {
         authenticated: true,
       };
-      const response = await request(`/api/permissions`, {
-        method: "POST",
-        body: JSON.stringify(bodyCheckPermission),
-      });
-      if (!response.ok) {
-        if (response.status === 401) {
-          localStorage.removeItem(TOKEN_KEY);
-          localStorage.removeItem("kratos_registration_flow");
-
-          const { data: flow } = await frontend.createBrowserLogoutFlow();
-
-          // Use the received token to "update" the flow and thus perform the logout
-          await frontend.updateLogoutFlow({
-            token: flow.logout_token,
-          });
-
-          return {
-            authenticated: false,
-            redirectTo: "/signin",
-          };
-        }
-      }
-      return {
-        authenticated: true,
-      };
     }
 
     return {
@@ -263,16 +233,26 @@ export const authProvider: AuthProvider = {
   getPermissions: async () => {
     const raw = localStorage.getItem(TOKEN_KEY);
 
-    if (!raw)
-      return {
-        overview: ["list"],
-        taskCenter: ["list", "show", "create", "edit", "delete"],
-      };
+    if (!raw) return {};
 
-    const localData = JSON.parse(raw);
-    const data = await fetchPermission(localData);
+    // const localData = JSON.parse(raw);
+    // const data = await fetchPermission(localData);
 
-    return data;
+    return {
+      overview: [
+        "list",
+        "/revenue/total",
+        "/transaction/total",
+        "/transaction/volume",
+        "/users/active",
+        "/users/total",
+        "/volumes/offramp",
+        "/volumes/onramp",
+        "/volumes/total",
+      ],
+      deposit: ["list", "show"],
+      withdraw: ["list", "show"],
+    };
   },
 
   getIdentity: async () => {
