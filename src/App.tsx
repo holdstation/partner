@@ -29,26 +29,11 @@ import {
   DollarOutlined,
   UserOutlined,
 } from "@ant-design/icons";
-import {
-  PartnerEdit,
-  PartnerCreate,
-  PartnerShow,
-  PartnerList,
-} from "./pages/partner";
-import { partnerConfigProvider } from "./providers/partnerConfigProvider";
-import { PartnerConfigEdit, PartnerConfigCreate } from "./pages/partner-config";
+
 import { statisticsProvider } from "./providers/statisticsProvider";
-import { taskCenterProvider } from "./providers/taskCenterProvider";
 import { Notfound } from "./components/not-found";
-import {
-  TaskCenterCreate,
-  TaskCenterEdit,
-  TaskCenterList,
-  TaskCenterShow,
-} from "./pages/task-center";
-import { tasksProvider } from "./providers/tasksProvider";
+
 import { permissionProvider } from "./providers/permissionProvider";
-import { AssignRole, ListUsersWithRoles, RemoveRole } from "./pages/roles";
 import { useNotificationProvider } from "./components/notification";
 
 function App() {
@@ -62,12 +47,9 @@ function App() {
           dataProvider={{
             default: dataProvider(import.meta.env.VITE_API_URL),
             deposit: depositProvider,
-            partnerConfig: partnerConfigProvider,
             partner: partnerProvider,
             withdraw: withdrawProvider,
             statistics: statisticsProvider,
-            taskCenter: taskCenterProvider,
-            tasks: tasksProvider,
             roles: permissionProvider,
           }}
           options={{
@@ -192,34 +174,7 @@ function App() {
                 <Route index element={<WithdrawList />} />
                 <Route element={<WithdrawShow />} path="show/:id" />
               </Route>
-              <Route path="/partner">
-                <Route index element={<PartnerList />} />
-                <Route element={<PartnerCreate />} path="create" />
-                <Route element={<PartnerShow />} path="show/:id">
-                  <Route index element={<></>}></Route>
 
-                  <Route
-                    path="config/create"
-                    element={<PartnerConfigCreate />}
-                  />
-                  <Route
-                    path="config/edit/:id_config"
-                    element={<PartnerConfigEdit />}
-                  />
-                </Route>
-                <Route element={<PartnerEdit />} path="edit/:id" />
-              </Route>
-              <Route path="/task-center">
-                <Route index element={<TaskCenterList />} />
-                <Route path="create" element={<TaskCenterCreate />} />
-                <Route path="edit" element={<TaskCenterEdit />} />
-                <Route path="show" element={<TaskCenterShow />} />
-              </Route>
-              <Route path="/roles" element={<ListUsersWithRoles />}>
-                <Route index element={<></>} />
-                <Route path="edit/:id/assign" element={<AssignRole />} />
-                <Route path="edit/:id/remove" element={<RemoveRole />} />
-              </Route>
               <Route path="*" element={<Notfound />}></Route>
             </Route>
             <Route
