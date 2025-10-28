@@ -63,6 +63,7 @@ export function ChartUserActive() {
     xField: "ts",
     yField: "value",
     colorField: "name",
+    labels: [{ text: "value", style: { dy: 10, fill: "#fff" } }],
     group: {
       padding: 0,
     },
