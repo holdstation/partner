@@ -73,7 +73,7 @@ export function WithdrawShow() {
                 label="Partner:"
                 value={
                   partner
-                    ? `${partner.name} | ${Number(partner.buffer_rate) * 100}%`
+                    ? `${partner.name}`
                     : null
                 }
               />
