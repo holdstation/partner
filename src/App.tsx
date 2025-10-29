@@ -194,7 +194,7 @@ function App() {
           <UnsavedChangesNotifier />
           <DocumentTitleHandler
             handler={({ resource, action }) => {
-              let title = "CMS CVPay"; // Default title
+              let title = "Holdstation Pay"; // Default title
               if (resource && action) {
                 title = `${resource?.meta?.label || resource?.name} ${action}`;
               }
