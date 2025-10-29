@@ -1,5 +1,6 @@
 import {
   CanAccess,
+  useCan,
   useMany,
   useNavigation,
   useResourceParams,
@@ -27,6 +28,7 @@ import { useTransaction } from "@/stores/useTransaction";
 export function DepositShow() {
   const { id } = useResourceParams();
   const { list } = useNavigation();
+  const { data } = useCan({ action: "list", resource: "partner" });
 
   const {
     result,
@@ -40,8 +42,8 @@ export function DepositShow() {
     resource: "partner", // Required: Specify the resource name for the data provider.
     ids: result?.partner_id ? [result.partner_id] : [], // Pass an empty array if no ID, rather than `[""]`.
     queryOptions: {
-      enabled: !!result?.partner_id, // Query is enabled only if `partner_id` exists.
-    },
+      enabled: !!result?.partner_id && data?.can, // Query is enabled only if `partner_id` exists.
+    }
   });
 
   const partner = partnersData?.data?.[0];

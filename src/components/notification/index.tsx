@@ -18,6 +18,14 @@ export const useNotificationProvider = (): NotificationProvider => {
       cancelMutation,
       undoableTimeout,
     }) => {
+      console.log("huyvx", {
+        key,
+        message,
+        description,
+        type,
+        cancelMutation,
+        undoableTimeout,
+      });
       if (key === "login-error" && description === "check") {
         return;
       }

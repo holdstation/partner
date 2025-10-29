@@ -1,8 +1,6 @@
 import type { AuthProvider } from "@refinedev/core";
 
 import { Configuration, FrontendApi } from "@ory/kratos-client";
-import { request } from "@/utils/request";
-import { fetchPermission } from "@/access-control-provider";
 
 export const TOKEN_KEY = "partner-auth";
 
@@ -40,12 +38,12 @@ function loadFlow() {
   return flow;
 }
 
-async function getOrCreateFlow() {
+export async function getOrCreateFlow() {
   let flow = loadFlow();
 
   if (!flow) {
     // tạo flow mới
-    const res = await fetch(`${BASE_API}/self-service/registration/browser`, {
+    const res = await fetch(`${BASE_API}/self-service/login/browser`, {
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
@@ -73,8 +71,8 @@ type KratosFlow = {
   };
 };
 
-function extractMethodAndCsrf(flow: KratosFlow) {
-  let csrf_token: string | undefined;
+export function extractMethodAndCsrf(flow: KratosFlow) {
+  let csrf_token: string = "";
   let method: string | undefined;
 
   for (const node of flow.ui.nodes) {
@@ -82,7 +80,7 @@ function extractMethodAndCsrf(flow: KratosFlow) {
 
     // lấy csrf_token
     if (name === "csrf_token") {
-      csrf_token = value;
+      csrf_token = value || "";
     }
 
     // lấy method (submit button có type=submit)
@@ -91,21 +89,14 @@ function extractMethodAndCsrf(flow: KratosFlow) {
     }
   }
 
-  return { method, csrf_token };
+  return { method, csrf_token: csrf_token };
 }
 
-/**
- * Helper function to create a form and submit it programmatically
- * This is used for OAuth provider authentication
- *
- * @param action - The form action URL from Ory flow
- * @param csrfToken - CSRF token for security
- * @param provider - OAuth provider (always 'google' in our case)
- */
-export function submitOAuthForm(
+export function submitForm(
   action: string,
   csrfToken: string,
-  provider: string = "microsoft"
+  email: string,
+  password: string
 ): void {
   const form = document.createElement("form");
 
@@ -120,21 +111,29 @@ export function submitOAuthForm(
   csrfInput.value = csrfToken;
   form.appendChild(csrfInput);
 
-  // Add provider
-  const providerInput = document.createElement("input");
+  // Add CSRF token
+  const emailInput = document.createElement("input");
 
-  providerInput.type = "hidden";
-  providerInput.name = "provider";
-  providerInput.value = provider;
-  form.appendChild(providerInput);
+  emailInput.type = "text";
+  emailInput.name = "identifier";
+  emailInput.value = email;
+  form.appendChild(emailInput);
 
-  // Add return_to URL to ensure proper redirect back to localhost callback
-  const returnToInput = document.createElement("input");
+  // Add CSRF token
+  const passwordInput = document.createElement("input");
 
-  returnToInput.type = "hidden";
-  returnToInput.name = "return_to";
-  returnToInput.value = window.location.origin + "/auth/callback";
-  form.appendChild(returnToInput);
+  passwordInput.type = "password";
+  passwordInput.name = "password";
+  passwordInput.value = password;
+  form.appendChild(passwordInput);
+
+  // Add CSRF token
+  const methodInput = document.createElement("input");
+
+  methodInput.type = "hidden";
+  methodInput.name = "method";
+  methodInput.value = "password";
+  form.appendChild(methodInput);
 
   // Submit form
   document.body.appendChild(form);
@@ -143,36 +142,39 @@ export function submitOAuthForm(
 }
 
 export const authProvider: AuthProvider = {
-  login: async ({ type }: { type: string }) => {
-    const sessionUrl = `${BASE_API}/sessions/whoami?tokenize_as=jwt`;
+  login: async ({ type }) => {
+    try {
+      const sessionUrl = `${BASE_API}/sessions/whoami?tokenize_as=jwt`;
 
-    const response = await fetch(sessionUrl, {
-      method: "GET",
-      credentials: "include",
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-    });
-
-    if (response.ok) {
+      const response = await fetch(sessionUrl, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      });
+      if (!response.ok) {
+        throw new Error("Error");
+      }
       const sessionData = await response.json();
-
       localStorage.setItem(TOKEN_KEY, JSON.stringify(sessionData));
 
       return {
         success: true,
         redirectTo: "/",
       };
-    }
-    if (type === "check") {
-      return {
-        success: false,
-        error: {
-          name: "check",
-          message:"check"
-        },
-      };
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (error: any) {
+      if (type === "check") {
+        return {
+          success: false,
+          error: {
+            name: "check",
+            message: "check",
+          },
+        };
+      }
     }
 
     return {
@@ -184,30 +186,7 @@ export const authProvider: AuthProvider = {
     };
   },
   register: async () => {
-    try {
-      const flow = await getOrCreateFlow();
-      // const url = flow.ui.action;
-      const { csrf_token } = extractMethodAndCsrf(flow);
-
-      if (!csrf_token) {
-        throw new Error("Không tìm thấy CSRF token");
-      }
-      submitOAuthForm(flow.ui.action, csrf_token, "microsoft");
-
-      return {
-        success: true,
-      };
-    } catch (error: any) {
-      const message = error?.message;
-
-      return {
-        success: false,
-        error: {
-          name: "RegisterError",
-          message: message || "Invalid username or password",
-        },
-      };
-    }
+    throw new Error("Not implemented");
   },
   logout: async () => {
     try {
@@ -241,27 +220,6 @@ export const authProvider: AuthProvider = {
     const raw = localStorage.getItem(TOKEN_KEY);
 
     if (raw) {
-      const response = await request(
-        `/api/statistics/volumes/onramp?interval=day`
-      );
-      if (!response.ok) {
-        if (response.status === 401) {
-          localStorage.removeItem(TOKEN_KEY);
-          localStorage.removeItem("kratos_registration_flow");
-
-          const { data: flow } = await frontend.createBrowserLogoutFlow();
-
-          // Use the received token to "update" the flow and thus perform the logout
-          await frontend.updateLogoutFlow({
-            token: flow.logout_token,
-          });
-
-          return {
-            authenticated: false,
-            redirectTo: "/signin",
-          };
-        }
-      }
       return {
         authenticated: true,
       };
@@ -275,16 +233,26 @@ export const authProvider: AuthProvider = {
   getPermissions: async () => {
     const raw = localStorage.getItem(TOKEN_KEY);
 
-    if (!raw)
-      return {
-        overview: ["list"],
-        taskCenter: ["list", "show", "create", "edit", "delete"],
-      };
+    if (!raw) return {};
 
-    const localData = JSON.parse(raw);
-    const data = await fetchPermission(localData);
+    // const localData = JSON.parse(raw);
+    // const data = await fetchPermission(localData);
 
-    return data;
+    return {
+      overview: [
+        "list",
+        "/revenue/total",
+        "/transaction/total",
+        "/transaction/volume",
+        "/users/active",
+        "/users/total",
+        "/volumes/offramp",
+        "/volumes/onramp",
+        "/volumes/total",
+      ],
+      deposit: ["list", "show"],
+      withdraw: ["list", "show"],
+    };
   },
 
   getIdentity: async () => {

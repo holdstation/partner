@@ -1,6 +1,6 @@
 import { StatisticType } from "@/types/statistic";
 import { useCustom } from "@refinedev/core";
-import { Card, Empty, Flex, Segmented, theme, Typography } from "antd";
+import { Card, Empty, Flex, Segmented, Typography } from "antd";
 import { useMemo, useState } from "react";
 import { Column } from "@ant-design/plots";
 import { useTheme } from "@/stores/theme";
@@ -36,10 +36,6 @@ export function ChartTransactionVolume() {
   const [themeMode] = useTheme(
     useShallow((state) => [state.theme, state.setTheme])
   );
-
-  const {
-    token: { colorText },
-  } = theme.useToken();
 
   const {
     result,
@@ -91,52 +87,14 @@ export function ChartTransactionVolume() {
         },
       },
     },
-    interaction: {
-      tooltip: {
-        render: (_: any, { title, items }: any) => {
-          return (
-            <div
-              key={title}
-              style={{
-                color: colorText,
-              }}
-            >
-              <h5 style={{ color: colorText, fontSize: 16 }}>{title}</h5>
-              {items.map((item: any) => {
-                const { name, value, color } = item;
-                return (
-                  <div>
-                    <div
-                      style={{
-                        margin: 0,
-                        display: "flex",
-                        justifyContent: "space-between",
-                      }}
-                    >
-                      <div>
-                        <span
-                          style={{
-                            display: "inline-block",
-                            width: 6,
-                            height: 6,
-                            borderRadius: "50%",
-                            backgroundColor: color,
-                            marginRight: 6,
-                          }}
-                        ></span>
-                        <span>{name}:</span>
-                      </div>
-                      <p className="pl-2">
-                        {formatDisplay(value, {})}
-                      </p>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          );
+    tooltip: {
+      items: [
+        (_: any, index: any, _2: any, column: any) => {
+          return {
+            value: `₫${formatDisplay(column.y?.value?.[index] || 0, {})}`, // 使用 y 通道的值
+          };
         },
-      },
+      ],
     },
   };
 

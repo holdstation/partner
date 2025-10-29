@@ -73,11 +73,25 @@ export const accessControlProvider: AccessControlProvider = {
     const raw = localStorage.getItem(TOKEN_KEY);
     if (!raw) return { can: false };
 
-    const localData = JSON.parse(raw);
+    // const localData = JSON.parse(raw);
 
-    const data = await fetchPermission(localData);
+    // const data = await fetchPermission(localData);
 
-    const permissions: Record<string, string[]> = data;
+    const permissions: Record<string, string[]> = {
+      overview: [
+        "list",
+        "/revenue/total",
+        "/transaction/total",
+        "/transaction/volume",
+        "/users/active",
+        "/users/total",
+        "/volumes/offramp",
+        "/volumes/onramp",
+        "/volumes/total",
+      ],
+      deposit: ["list", "show"],
+      withdraw: ["list", "show"],
+    };
     return {
       can: permissions[resource || ""]?.includes(action) ?? false,
     };
