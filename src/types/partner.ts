@@ -2,7 +2,7 @@ export interface PartnerType {
   id: string;
   name: string;
   description: string;
-  buffer_rate: number;
+  // buffer_rate: number;
   app_key: string;
   default_user: string;
   created_at: CreatedAt;
