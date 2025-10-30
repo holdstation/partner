@@ -101,7 +101,7 @@ export function submitForm(
   const form = document.createElement("form");
 
   form.method = "POST";
-  form.action = `${action}&return_to=/hvx`;
+  form.action = action
 
   // Add CSRF token
   const csrfInput = document.createElement("input");
