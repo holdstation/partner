@@ -30,7 +30,7 @@ async function getChangePasswordFlow() {
   if (!flow) {
     // tạo flow mới
     const res = await fetch(
-      `${import.meta.env.VITE_AUTH_URL}/self-service/login/browser`,
+      `${import.meta.env.VITE_AUTH_URL}/self-service/settings/browser`,
       {
         headers: {
           "Content-Type": "application/json",
