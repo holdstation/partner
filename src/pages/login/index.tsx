@@ -1,20 +1,41 @@
 import { Button, Card, Form, Input, Layout, Typography } from "antd";
 import { SwitchTheme } from "@/components/switch-theme";
-import { useCallback } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import {
   extractMethodAndCsrf,
   getOrCreateFlow,
   submitForm,
 } from "@/providers/authProvider";
+import { useSearchParams } from "react-router";
+import { useLogin } from "@refinedev/core";
 
 export function Login() {
   const [form] = Form.useForm();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const { mutateAsync } = useLogin();
+
+  const check = useMemo(() => {
+    return searchParams.get("to")?.startsWith("/login?flow=");
+  }, [searchParams]);
 
   const handleLogin = useCallback(async (values: any) => {
     const flow = await getOrCreateFlow();
     const { csrf_token } = extractMethodAndCsrf(flow);
     submitForm(flow.ui.action, csrf_token, values.email, values.password);
   }, []);
+
+  useEffect(() => {
+    if (check) {
+      mutateAsync({})
+        .then()
+        .catch(() => {
+          setSearchParams((params) => {
+            params.delete("to");
+            return params;
+          });
+        });
+    }
+  }, [check, mutateAsync, setSearchParams]);
 
   return (
     <Layout>
