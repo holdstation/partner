@@ -1,7 +1,5 @@
 import {
   CanAccess,
-  useCan,
-  useMany,
   useNavigation,
   useResourceParams,
   useShow,
@@ -22,13 +20,12 @@ import { getNameChainById } from "@/stores/chains";
 import { formatAddress } from "@/utils/format-address";
 import { getLinkTxHash } from "@/utils/getLinkTxHash";
 import { useBankInfo } from "@/stores/useBankInfo";
-import { PartnerType } from "@/types/partner";
 import { useTransaction } from "@/stores/useTransaction";
 
 export function DepositShow() {
   const { id } = useResourceParams();
   const { list } = useNavigation();
-  const { data } = useCan({ action: "list", resource: "partner" });
+  // const { data } = useCan({ action: "list", resource: "partner" });
 
   const {
     result,
@@ -38,15 +35,15 @@ export function DepositShow() {
 
   const { data: transactions } = useTransaction(id);
 
-  const { result: partnersData } = useMany<PartnerType>({
-    resource: "partner", // Required: Specify the resource name for the data provider.
-    ids: result?.partner_id ? [result.partner_id] : [], // Pass an empty array if no ID, rather than `[""]`.
-    queryOptions: {
-      enabled: !!result?.partner_id && data?.can, // Query is enabled only if `partner_id` exists.
-    }
-  });
+  // const { result: partnersData } = useMany<PartnerType>({
+  //   resource: "partner", // Required: Specify the resource name for the data provider.
+  //   ids: result?.partner_id ? [result.partner_id] : [], // Pass an empty array if no ID, rather than `[""]`.
+  //   queryOptions: {
+  //     enabled: !!result?.partner_id && data?.can, // Query is enabled only if `partner_id` exists.
+  //   }
+  // });
 
-  const partner = partnersData?.data?.[0];
+  // const partner = partnersData?.data?.[0];
 
   return (
     <CanAccess resource="deposit" action="show" fallback={<Notfound />}>
@@ -73,9 +70,7 @@ export function DepositShow() {
               <FieldOrderDetail
                 label="Partner:"
                 value={
-                  partner
-                    ? `${partner.name}`
-                    : null
+                  result?.partner_id
                 }
               />
               <FieldOrderDetail

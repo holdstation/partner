@@ -10,6 +10,7 @@ export interface WithdrawType {
   amount: string;
   currency: string;
   rate: string;
+  original_rate: string;
   token_address: string;
   recipient: string;
   chain_id: number;
@@ -28,6 +29,7 @@ export interface WithdrawType {
   transactions: null | TransferInfo[];
   partner?: PartnerType;
   error?: OrderError;
+  total_fee_vnd: string;
 }
 
 interface OrderError {

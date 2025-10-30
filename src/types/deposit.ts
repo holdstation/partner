@@ -10,6 +10,7 @@ export interface DepositType {
   amount: string;
   currency: string;
   rate: string;
+  original_rate: string;
   token_address: string;
   recipient: string;
   chain_id: number;
