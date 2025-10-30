@@ -101,7 +101,7 @@ export function submitForm(
   const form = document.createElement("form");
 
   form.method = "POST";
-  form.action = action
+  form.action = action;
 
   // Add CSRF token
   const csrfInput = document.createElement("input");
@@ -154,20 +154,13 @@ export const authProvider: AuthProvider = {
           "Content-Type": "application/json",
         },
       });
-      if (response.status === 401) {
-        const { data: flow } = await frontend.createBrowserLogoutFlow();
-
-        // Use the received token to "update" the flow and thus perform the logout
-        await frontend.updateLogoutFlow({
-          token: flow.logout_token,
-        });
-      }
       if (!response.ok) {
         throw new Error("Error");
       }
       const sessionData = await response.json();
       localStorage.setItem(TOKEN_KEY, JSON.stringify(sessionData));
-
+      localStorage.removeItem("kratos_registration_flow");
+      
       return {
         success: true,
         redirectTo: "/",
