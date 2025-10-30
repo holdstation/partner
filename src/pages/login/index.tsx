@@ -1,20 +1,36 @@
-import { Button, Card, Form, Input, Layout, Typography } from "antd";
+import { Button, Card, Form, Input, Layout, Spin, Typography } from "antd";
 import { SwitchTheme } from "@/components/switch-theme";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import {
   extractMethodAndCsrf,
   getOrCreateFlow,
   submitForm,
 } from "@/providers/authProvider";
+import { LoadingOutlined } from "@ant-design/icons";
+import { useNotification } from "@refinedev/core";
 
 export function Login() {
   const [form] = Form.useForm();
+  const [loading, setLoading] = useState(false);
+  const  { open } = useNotification()
 
   const handleLogin = useCallback(async (values: any) => {
+    setLoading(true);
+   try {
     const flow = await getOrCreateFlow();
     const { csrf_token } = extractMethodAndCsrf(flow);
     submitForm(flow.ui.action, csrf_token, values.email, values.password);
-  }, []);
+    setLoading(false);
+   } catch (_) {
+    open?.({
+      type:'error',
+      message:"Login Error",
+      description:"Invalid credentials"
+    })
+    setLoading(false);
+
+   }
+  }, [open]);
 
   return (
     <Layout>
@@ -46,6 +62,7 @@ export function Login() {
                   handleLogin(val);
                 }}
                 style={{ maxWidth: 600 }}
+                disabled={loading}
               >
                 <Form.Item
                   name={"email"}
@@ -67,7 +84,7 @@ export function Login() {
                 <Form.Item
                   name={"password"}
                   label={"Password"}
-                  required
+                  required                  
                   rules={[
                     {
                       required: true,
@@ -87,8 +104,16 @@ export function Login() {
                     type="primary"
                     size="large"
                     htmlType="submit"
+                    disabled={loading}
                   >
-                    Sign in
+                    {loading ? (
+                      <Spin
+                        indicator={<LoadingOutlined spin />}
+                        size="default"
+                      />
+                    ) : (
+                      "Sign in"
+                    )}
                   </Button>
                 </Form.Item>
               </Form>

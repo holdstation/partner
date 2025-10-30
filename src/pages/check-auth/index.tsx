@@ -11,14 +11,14 @@ export function AuthCallback() {
   }, [searchParams]);
 
   useEffect(() => {
-    mutateAsync({ type: check ? "" : "check" })
-      .then()
-      .catch(() => {
+    mutateAsync({ type: check ? "" : "check" }).then((e) => {
+      if (!e.success) {
         setSearchParams((params) => {
           params.delete("to");
           return params;
         });
-      });
+      }
+    });
   }, [check, mutateAsync, setSearchParams]);
 
   return <Outlet />;
