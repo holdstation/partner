@@ -154,6 +154,14 @@ export const authProvider: AuthProvider = {
           "Content-Type": "application/json",
         },
       });
+      if (response.status === 401) {
+        const { data: flow } = await frontend.createBrowserLogoutFlow();
+
+        // Use the received token to "update" the flow and thus perform the logout
+        await frontend.updateLogoutFlow({
+          token: flow.logout_token,
+        });
+      }
       if (!response.ok) {
         throw new Error("Error");
       }
@@ -220,6 +228,16 @@ export const authProvider: AuthProvider = {
     const raw = localStorage.getItem(TOKEN_KEY);
 
     if (raw) {
+      const expires_at = JSON.parse(raw).expires_at;
+      if (Date.now() > new Date(expires_at).getTime()) {
+        localStorage.removeItem(TOKEN_KEY);
+        localStorage.removeItem("kratos_registration_flow");
+
+        return {
+          authenticated: false,
+          redirectTo: "/signin",
+        };
+      }
       return {
         authenticated: true,
       };

@@ -19,5 +19,12 @@ export async function request(url: string, init: RequestInit = {}) {
     Authorization: `Bearer ${localData.tokenized}`,
   };
 
-  return fetch(requestUrl, requestInit);
+  const response = await fetch(requestUrl, requestInit);
+
+  if (response.status == 401) {
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem("kratos_registration_flow");
+    window.location.href = "/";
+  }
+  return response;
 }
