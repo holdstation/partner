@@ -8,39 +8,19 @@ import { Button, Table } from "antd";
 import dayjs from "dayjs";
 import { filterStatusData, getColorStatus2, getStatus2 } from "./module/data";
 import { EyeIcon } from "@/icons";
-import {
-  CanAccess,
-  getDefaultFilter,
-  useList,
-  useNavigation,
-} from "@refinedev/core";
+import { CanAccess, useNavigation } from "@refinedev/core";
 import { InputSearch } from "@/components/input-search";
 import { RangePickerFilter } from "@/components/range-picker";
-import { PartnerType } from "@/types/partner";
-import { useMemo } from "react";
 import { LabelSort } from "@/components/label-sort";
 import { Notfound } from "@/components/not-found";
 
 export function DepositList() {
-  const { tableProps, filters } = useTable<DepositType>({
+  const { tableProps } = useTable<DepositType>({
     syncWithLocation: true,
     resource: "deposit",
   });
 
   const { show } = useNavigation();
-
-  const { result } = useList<PartnerType>({
-    resource: "partner",
-  });
-
-  const filterPartner = useMemo(() => {
-    if (!result.data) {
-      return [];
-    }
-    return result.data.map((e) => {
-      return { text: e.name, value: e.id };
-    });
-  }, [result.data]);
 
   return (
     <CanAccess resource="deposit" action="list" fallback={<Notfound />}>
@@ -65,8 +45,6 @@ export function DepositList() {
             render={(_, record: DepositType) => (
               <TextField value={record.partner?.name} />
             )}
-            filters={filterPartner}
-            filteredValue={getDefaultFilter("partner_ids", filters, "eq")}
           />
 
           <Table.Column

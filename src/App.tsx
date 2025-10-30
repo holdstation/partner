@@ -35,6 +35,24 @@ import { Notfound } from "./components/not-found";
 
 import { permissionProvider } from "./providers/permissionProvider";
 import { useNotificationProvider } from "./components/notification";
+import { QueryClient } from "@tanstack/react-query";
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 1,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: true,
+      staleTime: 1000 * 60, // 1 phút
+      
+    },
+    mutations: {
+      retry: 0,
+      onError: (error) => {
+        console.error("Mutation error:", error);
+      },
+    },
+  },
+});
 
 function App() {
   return (
@@ -56,6 +74,7 @@ function App() {
             syncWithLocation: true,
             warnWhenUnsavedChanges: true,
             projectId: "oPSgFo-8WUJoR-2GF4My",
+            reactQuery: { clientConfig: queryClient },
           }}
           resources={[
             {
