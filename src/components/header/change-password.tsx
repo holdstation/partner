@@ -185,7 +185,7 @@ function FormChangePassword(props: { onClose: () => void }) {
           hidden={true}
           initialValue={method}
         >
-          <Input name="method" value={method} />
+          <Input name="method" defaultValue={method} />
         </Form.Item>
 
         <Form.Item
