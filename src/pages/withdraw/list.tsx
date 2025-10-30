@@ -5,12 +5,7 @@ import { List, TagField, TextField, useTable } from "@refinedev/antd";
 import { Button, Table } from "antd";
 import dayjs from "dayjs";
 import { EyeIcon } from "@/icons";
-import {
-  CanAccess,
-  getDefaultFilter,
-  useList,
-  useNavigation,
-} from "@refinedev/core";
+import { CanAccess, useNavigation } from "@refinedev/core";
 import { InputSearch } from "@/components/input-search";
 import { RangePickerFilter } from "@/components/range-picker";
 import {
@@ -19,31 +14,16 @@ import {
   getStatus2,
 } from "../deposit/module/data";
 import { WithdrawType } from "@/types/withdraw";
-import { PartnerType } from "@/types/partner";
-import { useMemo } from "react";
 import { LabelSort } from "@/components/label-sort";
 import { Notfound } from "@/components/not-found";
 
 export function WithdrawList() {
-  const { tableProps, filters } = useTable<WithdrawType>({
+  const { tableProps } = useTable<WithdrawType>({
     syncWithLocation: true,
     resource: "withdraw",
   });
 
   const { show } = useNavigation();
-
-  const { result } = useList<PartnerType>({
-    resource: "partner",
-  });
-
-  const filterPartner = useMemo(() => {
-    if (!result.data) {
-      return [];
-    }
-    return result.data.map((e) => {
-      return { text: e.name, value: e.id };
-    });
-  }, [result.data]);
 
   return (
     <CanAccess resource="withdraw" action="list" fallback={<Notfound />}>
@@ -68,9 +48,6 @@ export function WithdrawList() {
             render={(_, record: WithdrawType) => (
               <TextField value={record.partner?.name} />
             )}
-            filters={filterPartner}
-            filteredValue={getDefaultFilter("partner_ids", filters, "eq")}
-            defaultFilteredValue={getDefaultFilter("partner_ids", filters)}
           />
 
           <Table.Column

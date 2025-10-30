@@ -1,6 +1,5 @@
 import {
   CanAccess,
-  useMany,
   useNavigation,
   useResourceParams,
   useShow,
@@ -23,7 +22,6 @@ import { getLinkTxHash } from "@/utils/getLinkTxHash";
 import { formatAddress } from "@/utils/format-address";
 import { useBankInfo } from "@/stores/useBankInfo";
 import { useTransaction } from "@/stores/useTransaction";
-import { PartnerType } from "@/types/partner";
 
 const { Title } = Typography;
 
@@ -41,15 +39,15 @@ export function WithdrawShow() {
 
   const { data: bankInfo } = useBankInfo(result?.payment_info?.bank_id);
 
-  const { result: partnersData } = useMany<PartnerType>({
-    resource: "partner", // Required: Specify the resource name for the data provider.
-    ids: result?.partner_id ? [result.partner_id] : [], // Pass an empty array if no ID, rather than `[""]`.
-    queryOptions: {
-      enabled: !!result?.partner_id, // Query is enabled only if `partner_id` exists.
-    },
-  });
+  // const { result: partnersData } = useMany<PartnerType>({
+  //   resource: "partner", // Required: Specify the resource name for the data provider.
+  //   ids: result?.partner_id ? [result.partner_id] : [], // Pass an empty array if no ID, rather than `[""]`.
+  //   queryOptions: {
+  //     enabled: !!result?.partner_id, // Query is enabled only if `partner_id` exists.
+  //   },
+  // });
 
-  const partner = partnersData?.data?.[0];
+  // const partner = partnersData?.data?.[0];
 
   return (
     <CanAccess resource="withdraw" action="show" fallback={<Notfound />}>
@@ -69,14 +67,7 @@ export function WithdrawShow() {
           <div className="grid grid-cols-1 sm:grid-cols-2">
             <div className="flex flex-col gap-3">
               <FieldOrderDetail label="Order No:" value={result?.id} />
-              <FieldOrderDetail
-                label="Partner:"
-                value={
-                  partner
-                    ? `${partner.name}`
-                    : null
-                }
-              />
+              <FieldOrderDetail label="Partner:" value={result?.partner_id} />
               <FieldOrderDetail
                 label="Create time:"
                 value={
@@ -127,8 +118,8 @@ export function WithdrawShow() {
               <FieldOrderDetail
                 label="Rate:"
                 value={
-                  result?.rate
-                    ? `${formatDisplay(Number(result.rate), {})} VND`
+                  result?.original_rate
+                    ? `${formatDisplay(Number(result.original_rate), {})} VND`
                     : null
                 }
               />
