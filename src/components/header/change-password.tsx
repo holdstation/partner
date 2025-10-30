@@ -27,7 +27,7 @@ function loadFlow() {
 
 async function getChangePasswordFlow() {
   let flow = loadFlow();
-
+  await new Promise((e) => setTimeout(e, 2000));
   if (!flow) {
     // tạo flow mới
     const res = await fetch(
@@ -50,7 +50,7 @@ async function getChangePasswordFlow() {
   return flow;
 }
 
-export function extractMethodAndCsrf(flow: any) {
+function extractMethodAndCsrf(flow: any) {
   if (!flow) {
     return { method: "", csrf_token: "", action: "", email: "" };
   }
@@ -120,7 +120,6 @@ export function ChangePassword() {
 function FormChangePassword(props: { onClose: () => void }) {
   const [flow, setFlow] = useState();
   const [loading, setLoading] = useState(false);
-  console.log(flow);
 
   const { csrf_token, method, action, email } = extractMethodAndCsrf(flow);
 
@@ -168,14 +167,24 @@ function FormChangePassword(props: { onClose: () => void }) {
 
   return (
     <div className="mt-6">
-      <Form layout="vertical" action={action} method={"POST"}>
-        <Form.Item name={"csrf_token"} hidden={true}>
-          <Input value={csrf_token} />
+      <form action={action} method={"POST"}>
+        <Form.Item name={"csrf_token"} hidden={true} initialValue={csrf_token}>
+          <Input value={csrf_token} defaultValue={csrf_token} />
         </Form.Item>
-        <Form.Item label="email" name="traits.email" hidden={true}>
-          <Input name="traits.email" value={email} />
+        <Form.Item
+          label="email"
+          name="traits.email"
+          hidden={true}
+          initialValue={email}
+        >
+          <Input name="traits.email" defaultValue={email} />
         </Form.Item>
-        <Form.Item label="method" name="method" hidden={true}>
+        <Form.Item
+          label="method"
+          name="method"
+          hidden={true}
+          initialValue={method}
+        >
           <Input name="method" value={method} />
         </Form.Item>
 
@@ -233,7 +242,7 @@ function FormChangePassword(props: { onClose: () => void }) {
             </Button>
           </Flex>
         </Form.Item>
-      </Form>
+      </form>
     </div>
   );
 }
