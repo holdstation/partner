@@ -3,7 +3,7 @@ import {
   useLogout,
 } from "@refinedev/core";
 import { Avatar, Button, Popover, Typography } from "antd";
-import { ChangePassword } from "./change-password";
+// import { ChangePassword } from "./change-password";
 const { Text, Title } = Typography;
 
 export function UserDropdown() {
@@ -22,7 +22,7 @@ export function UserDropdown() {
               </Title>
               <Text strong>{data?.email}</Text>
             </div>
-            <ChangePassword />
+            {/* <ChangePassword /> */}
             <Button
               onClick={() => {
                 logout();
