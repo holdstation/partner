@@ -1,4 +1,4 @@
-import { Card, Flex, Segmented, Spin, theme, Typography } from "antd";
+import { Card, Flex, Spin, theme, Typography } from "antd";
 import { UserOutlined } from "@ant-design/icons";
 import { formatDisplay } from "@/utils/format-display";
 import { useMemo, useState } from "react";
@@ -11,7 +11,7 @@ export function TotalUsers() {
     token: { colorPrimaryActive },
   } = theme.useToken();
 
-  const [interval, setFilterInterval] = useState("Day");
+  const [interval] = useState("total");
 
   const {
     result,
@@ -47,13 +47,13 @@ export function TotalUsers() {
           <Typography.Text>Total Users</Typography.Text>
           <Flex vertical={false} gap={4}>
             <div>
-              <Segmented
+              {/* <Segmented
                 options={["Day", "Week", "Month"]}
                 value={interval}
                 onChange={(value) => {
                   setFilterInterval(value);
                 }}
-              />
+              /> */}
             </div>
 
             <div
