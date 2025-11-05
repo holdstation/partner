@@ -1,16 +1,14 @@
 import {
-  CanAccess,
   useGetIdentity,
   useLogout,
-  useNavigation,
 } from "@refinedev/core";
 import { Avatar, Button, Popover, Typography } from "antd";
+import { ChangePassword } from "./change-password";
 const { Text, Title } = Typography;
 
 export function UserDropdown() {
   const { data } = useGetIdentity();
   const { mutate: logout } = useLogout();
-  const { list } = useNavigation();
 
   return (
     <div className="flex items-center gap-4">
@@ -24,21 +22,7 @@ export function UserDropdown() {
               </Title>
               <Text strong>{data?.email}</Text>
             </div>
-            <CanAccess resource="roles" action="list">
-              <Button
-                type="text"
-                style={{
-                  width: "100%",
-                  justifyContent: "start",
-                }}
-                onClick={() => {
-                  list("roles");
-                }}
-              >
-                Permission
-              </Button>
-            </CanAccess>
-
+            <ChangePassword />
             <Button
               onClick={() => {
                 logout();
