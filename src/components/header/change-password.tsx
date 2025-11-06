@@ -198,6 +198,7 @@ function FormChangePassword(props: { onClose: () => void }) {
         {...form}
         layout="vertical"
         onFinish={(value) => {
+          console.log(value)
           SubmitForm({
             action: action,
             csrfToken: csrf_token,
@@ -252,7 +253,7 @@ function FormChangePassword(props: { onClose: () => void }) {
             >
               Close
             </Button>
-            <Button type="primary" onClick={form.submit}>
+            <Button type="primary" htmlType="submit">
               Submit
             </Button>
           </Flex>
