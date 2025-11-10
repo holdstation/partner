@@ -27,19 +27,15 @@ function loadFlow() {
 
 async function getChangePasswordFlow() {
   let flow = loadFlow();
-  await new Promise((e) => setTimeout(e, 2000));
   if (!flow) {
     // tạo flow mới
-    const res = await fetch(
-      `${import.meta.env.VITE_AUTH_URL}/self-service/settings/browser`,
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        credentials: "include",
-      }
-    );
+    const res = await fetch(`${import.meta.env.VITE_AUTH_URL}/self-service/settings/browser`, {
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+      credentials: "include",
+    });
 
     flow = await res.json();
     if (res.ok) {
@@ -79,6 +75,42 @@ function extractMethodAndCsrf(flow: any) {
   return { method, csrf_token: csrf_token, action: flow.ui.action, email };
 }
 
+function SubmitForm({ action, csrfToken, password }: { action: string; csrfToken: string; password: string }) {
+  const form = document.createElement("form");
+
+  form.method = "POST";
+  form.action = action;
+
+  // Add CSRF token
+  const csrfInput = document.createElement("input");
+
+  csrfInput.type = "hidden";
+  csrfInput.name = "csrf_token";
+  csrfInput.value = csrfToken;
+  form.appendChild(csrfInput);
+
+  // Add CSRF token
+  const passwordInput = document.createElement("input");
+
+  passwordInput.type = "password";
+  passwordInput.name = "password";
+  passwordInput.value = password;
+  form.appendChild(passwordInput);
+
+  // Add CSRF token
+  const methodInput = document.createElement("input");
+
+  methodInput.type = "hidden";
+  methodInput.name = "method";
+  methodInput.value = "password";
+  form.appendChild(methodInput);
+
+  // Submit form
+  document.body.appendChild(form);
+  form.submit();
+  document.body.removeChild(form);
+}
+
 export function ChangePassword() {
   const [open, setOpen] = useState(false);
 
@@ -104,13 +136,7 @@ export function ChangePassword() {
       >
         Change Password
       </Button>
-      <Modal
-        open={open}
-        title="Change Password"
-        onOk={handleOk}
-        onCancel={handleCancel}
-        footer={null}
-      >
+      <Modal open={open} title="Change Password" onOk={handleOk} onCancel={handleCancel} footer={null}>
         {open ? <FormChangePassword onClose={handleCancel} /> : null}
       </Modal>
     </>
@@ -121,7 +147,8 @@ function FormChangePassword(props: { onClose: () => void }) {
   const [flow, setFlow] = useState();
   const [loading, setLoading] = useState(false);
 
-  const { csrf_token, method, action, email } = extractMethodAndCsrf(flow);
+  const { csrf_token, action } = extractMethodAndCsrf(flow);
+  const [form] = Form.useForm();
 
   const handleGetFlow = useCallback(async () => {
     setLoading(true);
@@ -167,27 +194,18 @@ function FormChangePassword(props: { onClose: () => void }) {
 
   return (
     <div className="mt-6">
-      <form action={action} method={"POST"}>
-        <Form.Item name={"csrf_token"} hidden={true} initialValue={csrf_token}>
-          <Input value={csrf_token} defaultValue={csrf_token} />
-        </Form.Item>
-        <Form.Item
-          label="email"
-          name="traits.email"
-          hidden={true}
-          initialValue={email}
-        >
-          <Input name="traits.email" defaultValue={email} />
-        </Form.Item>
-        <Form.Item
-          label="method"
-          name="method"
-          hidden={true}
-          initialValue={method}
-        >
-          <Input name="method" defaultValue={method} />
-        </Form.Item>
-
+      <Form
+        {...form}
+        layout="vertical"
+        onFinish={(value) => {
+          console.log(value)
+          SubmitForm({
+            action: action,
+            csrfToken: csrf_token,
+            password: value.password,
+          });
+        }}
+      >
         <Form.Item
           label="Password"
           name="password"
@@ -219,9 +237,7 @@ function FormChangePassword(props: { onClose: () => void }) {
                 if (!value || getFieldValue("password") === value) {
                   return Promise.resolve();
                 }
-                return Promise.reject(
-                  new Error("The new password that you entered do not match!")
-                );
+                return Promise.reject(new Error("The new password that you entered do not match!"));
               },
             }),
           ]}
@@ -242,7 +258,7 @@ function FormChangePassword(props: { onClose: () => void }) {
             </Button>
           </Flex>
         </Form.Item>
-      </form>
+      </Form>
     </div>
   );
 }
