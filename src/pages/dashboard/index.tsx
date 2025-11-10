@@ -10,6 +10,7 @@ import { ChartUserActive } from "./module/chart-user-active";
 import { CanAccess, usePermissions } from "@refinedev/core";
 import { Notfound } from "@/components/not-found";
 import { SmileOutlined } from "@ant-design/icons";
+import { ChartPartnerOrder } from "./module/partner-order";
 
 export function Dashboard() {
   const { data } = usePermissions({});
@@ -19,10 +20,7 @@ export function Dashboard() {
       <Layout>
         {data?.overview.length === 1 ? (
           <Layout.Content>
-            <Result
-              icon={<SmileOutlined />}
-              title="Welcome"
-            />
+            <Result icon={<SmileOutlined />} title="Welcome" />
           </Layout.Content>
         ) : (
           <Layout.Content>
@@ -73,6 +71,11 @@ export function Dashboard() {
                   <ChartUserActive />
                 </Col>
               </CanAccess>
+            </Row>
+            <Row className="mt-6" gutter={[24, 24]}>
+              <Col xs={24} sm={24} xl={24}>
+                <ChartPartnerOrder />
+              </Col>
             </Row>
           </Layout.Content>
         )}
