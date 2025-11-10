@@ -133,7 +133,7 @@ export function ChartPartnerOrder() {
     >
       <Flex gap={16} vertical={true}>
         <Flex vertical={false} align="center" justify="space-between">
-          <Typography.Title level={4}>Partners Transaction</Typography.Title>
+          <Typography.Title level={4}>Transaction Count</Typography.Title>
           <Flex vertical={false} gap={4}>
             <div>
               <Segmented
