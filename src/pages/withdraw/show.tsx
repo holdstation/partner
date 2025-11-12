@@ -135,7 +135,7 @@ export function WithdrawShow() {
                 value={result?.amount ? `${formatDisplay(Number(result.amount), {})} USDT` : null}
               />
               <FieldOrderDetail
-                label="Amount Received"
+                label="Amount Received:"
                 value={result?.outcome ? `${formatDisplay(Number(result.outcome), {})} VND` : null}
               />
               <FieldOrderDetail

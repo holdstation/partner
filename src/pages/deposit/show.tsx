@@ -125,7 +125,7 @@ export function DepositShow() {
                 value={result?.amount ? `${formatDisplay(Number(result.amount), {})} VND` : null}
               />
               <FieldOrderDetail
-                label="Amount Received"
+                label="Amount Received:"
                 value={result?.outcome ? `${formatDisplay(Number(result?.outcome), {})} USDT` : null}
               />
               <FieldOrderDetail label="Client IP:" value={result?.client_ip} />
