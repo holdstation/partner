@@ -1,27 +1,21 @@
-import {
-  CanAccess,
-  useNavigation,
-  useResourceParams,
-  useShow,
-} from "@refinedev/core";
+import { CanAccess, useNavigation, useResourceParams, useShow } from "@refinedev/core";
 import dayjs from "dayjs";
 import { Breadcrumb } from "@refinedev/antd";
 
 import { formatDisplay } from "@/utils/format-display";
 import { Flex, Tag, Typography } from "antd";
 import { Show } from "@refinedev/antd";
-import {
-  FieldOrderDetail,
-  FieldOrderDetailStatus,
-} from "@/components/orders/field-order-detail";
-import { getColorStatus2, getStatus2 } from "../deposit/module/data";
-import { WithdrawType } from "@/types/withdraw";
+import { FieldOrderDetail, FieldOrderDetailStatus } from "@/components/orders/field-order-detail";
+
 import { Notfound } from "@/components/not-found";
 import { getNameChainById } from "@/stores/chains";
 import { getLinkTxHash } from "@/utils/getLinkTxHash";
 import { formatAddress } from "@/utils/format-address";
 import { useBankInfo } from "@/stores/useBankInfo";
 import { useTransaction } from "@/stores/useTransaction";
+import { OrderType } from "@/types/order";
+import { getLabelColorOrderStatus, getLabelOrderStatus } from "../deposit/module/data";
+import { getLabelColorProcessingState, getLabelProcessingState } from "./data";
 
 const { Title } = Typography;
 
@@ -33,7 +27,7 @@ export function WithdrawShow() {
   const {
     result,
     query: { isLoading },
-  } = useShow<WithdrawType>();
+  } = useShow<OrderType>();
 
   const { data: transactions } = useTransaction(id);
 
@@ -70,33 +64,15 @@ export function WithdrawShow() {
               <FieldOrderDetail label="Partner:" value={result?.partner_id} />
               <FieldOrderDetail
                 label="Create time:"
-                value={
-                  result
-                    ? dayjs(result.created_at.seconds * 1000).format(
-                        "DD/MM/YYYY HH:mm"
-                      )
-                    : null
-                }
+                value={result ? dayjs(result.created_at.seconds * 1000).format("DD/MM/YYYY HH:mm") : null}
               />
               <FieldOrderDetail
                 label="Update time:"
-                value={
-                  result
-                    ? dayjs(result.updated_at.seconds * 1000).format(
-                        "DD/MM/YYYY HH:mm"
-                      )
-                    : null
-                }
+                value={result ? dayjs(result.updated_at.seconds * 1000).format("DD/MM/YYYY HH:mm") : null}
               />
               <FieldOrderDetail
                 label="Expired time:"
-                value={
-                  result
-                    ? dayjs(result.expired_at.seconds * 1000).format(
-                        "DD/MM/YYYY HH:mm"
-                      )
-                    : null
-                }
+                value={result ? dayjs(result.expired_at.seconds * 1000).format("DD/MM/YYYY HH:mm") : null}
               />
 
               <FieldOrderDetail label="Payment method:" value={"VietQR"} />
@@ -105,9 +81,17 @@ export function WithdrawShow() {
               <FieldOrderDetailStatus
                 label="Status:"
                 value={
-                  getStatus2(result?.state) ? (
-                    <Tag color={getColorStatus2(result?.state)}>
-                      {getStatus2(result?.state)}
+                  getLabelOrderStatus(result?.state) ? (
+                    <Tag color={getLabelColorOrderStatus(result?.state)}>{getLabelOrderStatus(result?.state)}</Tag>
+                  ) : undefined
+                }
+              />
+              <FieldOrderDetailStatus
+                label="Processing Status:"
+                value={
+                  getLabelProcessingState(result?.processing_state) ? (
+                    <Tag color={getLabelColorProcessingState(result?.processing_state)}>
+                      {getLabelProcessingState(result?.processing_state)}
                     </Tag>
                   ) : undefined
                 }
@@ -117,16 +101,9 @@ export function WithdrawShow() {
             <div className="flex flex-col gap-3 mt-4">
               <FieldOrderDetail
                 label="Rate:"
-                value={
-                  result?.original_rate
-                    ? `${formatDisplay(Number(result.original_rate), {})} VND`
-                    : null
-                }
+                value={result?.original_rate ? `${formatDisplay(Number(result.original_rate), {})} VND` : null}
               />
-              <FieldOrderDetail
-                label="Network:"
-                value={getNameChainById(result?.chain_id)}
-              />
+              <FieldOrderDetail label="Network:" value={getNameChainById(result?.chain_id)} />
 
               <FieldOrderDetail
                 label="TX Hash:"
@@ -155,19 +132,22 @@ export function WithdrawShow() {
               />
               <FieldOrderDetail
                 label="Total Payment:"
-                value={
-                  result?.amount
-                    ? `${formatDisplay(Number(result.amount), {})} USDT`
-                    : null
-                }
+                value={result?.amount ? `${formatDisplay(Number(result.amount), {})} USDT` : null}
               />
               <FieldOrderDetail
-                label="Amount Received"
-                value={
-                  result?.outcome
-                    ? `${formatDisplay(Number(result.outcome), {})} VND`
-                    : null
-                }
+                label="Amount Received:"
+                value={result?.outcome ? `${formatDisplay(Number(result.outcome), {})} VND` : null}
+              />
+              <FieldOrderDetail
+                label="Wallet Address:"
+                value={transactions?.[0].body?.sender ? formatAddress(transactions?.[0].body?.sender) : null}
+                copyable={transactions?.[0].body?.sender ? { text: transactions?.[0].body?.sender } : undefined}
+              />
+
+              <FieldOrderDetail
+                label="Wallet Received:"
+                value={result?.recipient ? `${formatAddress(result?.recipient)}` : null}
+                copyable={result?.recipient ? { text: result.recipient } : undefined}
               />
               <FieldOrderDetail label="Client IP:" value={result?.client_ip} />
             </div>
@@ -179,18 +159,9 @@ export function WithdrawShow() {
                 Payment Info
               </Typography.Title>
               <div className="flex flex-col gap-2">
-                <FieldOrderDetail
-                  label="Account number:"
-                  value={result?.payment_info.account_number}
-                />
-                <FieldOrderDetail
-                  label="Account name:"
-                  value={result?.payment_info.full_name}
-                />
-                <FieldOrderDetail
-                  label="Bank name:"
-                  value={bankInfo?.short_name}
-                />
+                <FieldOrderDetail label="Account number:" value={result?.payment_info.account_number} />
+                <FieldOrderDetail label="Account name:" value={result?.payment_info.full_name} />
+                <FieldOrderDetail label="Bank name:" value={bankInfo?.short_name} />
               </div>
             </Flex>
           ) : null}

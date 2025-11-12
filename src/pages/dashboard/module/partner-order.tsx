@@ -87,6 +87,7 @@ export function ChartPartnerOrder() {
         type: "interval",
         yField: "value",
         seriesField: "group",
+        colorField: "group",
         group: {
           groupBy: "group",
           padding: 0,
@@ -96,10 +97,6 @@ export function ChartPartnerOrder() {
           textBaseline: "bottom",
           position: "inside",
         },
-        stack: {
-          groupBy: ["x", "series"],
-        },
-
         tooltip: {
           items: [
             (datum: any) => {
@@ -133,7 +130,7 @@ export function ChartPartnerOrder() {
     >
       <Flex gap={16} vertical={true}>
         <Flex vertical={false} align="center" justify="space-between">
-          <Typography.Title level={4}>Partners Transaction</Typography.Title>
+          <Typography.Title level={4}>Transaction Count</Typography.Title>
           <Flex vertical={false} gap={4}>
             <div>
               <Segmented
