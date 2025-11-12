@@ -65,7 +65,7 @@ export function ChartPartnerOrder() {
         partner_id: e.partner_id,
         period: e.period,
         value: e.deposit_orders || 0,
-        group: "deposit",
+        group: "Deposit",
       };
     });
     const temp2 = result.data.partner_order_summaries.map((e) => {
@@ -73,7 +73,7 @@ export function ChartPartnerOrder() {
         partner_id: e.partner_id,
         period: e.period,
         value: e.withdraw_orders || 0,
-        group: "withdraw",
+        group: "Withdraw",
       };
     });
 
