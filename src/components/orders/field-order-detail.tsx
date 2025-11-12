@@ -1,5 +1,6 @@
 import { Typography } from "antd";
 import { ReactNode } from "react";
+import { CopyConfig } from "antd/lib/typography/Base";
 
 const { Text } = Typography;
 
@@ -7,21 +8,19 @@ export function FieldOrderDetail(props: {
   label: string;
   value?: string | null | number;
   render?: () => ReactNode;
+  copyable?: CopyConfig;
 }) {
   return (
     <div className="flex flex-col md:flex-row gap-1 md:gap-2 md:items-center">
       <Text className="min-w-40 md:text-right" type="secondary">
         {props.label}
       </Text>
-      {props.render ? props.render() : <Text>{props.value}</Text>}
+      {props.render ? props.render() : <Text copyable={props.copyable}>{props.value}</Text>}
     </div>
   );
 }
 
-export function FieldOrderDetailStatus(props: {
-  label: string;
-  value?: ReactNode;
-}) {
+export function FieldOrderDetailStatus(props: { label: string; value?: ReactNode }) {
   return (
     <div className="flex flex-col md:flex-row gap-1 md:gap-2 md:items-center">
       <Text className="min-w-40 md:text-right" type="secondary">

@@ -1,6 +1,6 @@
 import { PartnerType } from "./partner";
 
-export interface DepositType {
+export interface OrderType {
   id: string;
   user_id: string;
   order_type: number;
@@ -26,7 +26,7 @@ export interface DepositType {
   payment_info: Partial<PaymentInfo>;
   client_ip: string;
   outcome: string;
-  transactions: null | TransferInfo[];
+  transactions?: null | TransferInfo[];
   partner?: PartnerType;
   error?: OrderError;
 }

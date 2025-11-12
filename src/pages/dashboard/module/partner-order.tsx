@@ -87,6 +87,7 @@ export function ChartPartnerOrder() {
         type: "interval",
         yField: "value",
         seriesField: "group",
+        colorField: "group",
         group: {
           groupBy: "group",
           padding: 0,
@@ -96,10 +97,6 @@ export function ChartPartnerOrder() {
           textBaseline: "bottom",
           position: "inside",
         },
-        stack: {
-          groupBy: ["x", "series"],
-        },
-
         tooltip: {
           items: [
             (datum: any) => {

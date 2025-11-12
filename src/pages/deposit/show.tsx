@@ -1,49 +1,35 @@
-import {
-  CanAccess,
-  useNavigation,
-  useResourceParams,
-  useShow,
-} from "@refinedev/core";
+import { CanAccess, useNavigation, useResourceParams, useShow } from "@refinedev/core";
 import dayjs from "dayjs";
 
-import { DepositType } from "@/types/deposit";
 import { formatDisplay } from "@/utils/format-display";
-import { getColorStatus2, getStatus2 } from "./module/data";
+import {
+  getLabelColorOrderStatus,
+  getLabelColorProcessingState,
+  getLabelOrderStatus,
+  getLabelProcessingState,
+} from "./module/data";
 import { Flex, Tag, Typography } from "antd";
 import { Show, Breadcrumb } from "@refinedev/antd";
-import {
-  FieldOrderDetail,
-  FieldOrderDetailStatus,
-} from "@/components/orders/field-order-detail";
+import { FieldOrderDetail, FieldOrderDetailStatus } from "@/components/orders/field-order-detail";
 import { Notfound } from "@/components/not-found";
 import { getNameChainById } from "@/stores/chains";
 import { formatAddress } from "@/utils/format-address";
 import { getLinkTxHash } from "@/utils/getLinkTxHash";
 import { useBankInfo } from "@/stores/useBankInfo";
 import { useTransaction } from "@/stores/useTransaction";
+import { OrderType } from "@/types/order";
 
 export function DepositShow() {
   const { id } = useResourceParams();
   const { list } = useNavigation();
-  // const { data } = useCan({ action: "list", resource: "partner" });
 
   const {
     result,
     query: { isLoading },
-  } = useShow<DepositType>();
+  } = useShow<OrderType>();
   const { data: bankInfo } = useBankInfo(result?.payment_info?.bank_id);
 
   const { data: transactions } = useTransaction(id);
-
-  // const { result: partnersData } = useMany<PartnerType>({
-  //   resource: "partner", // Required: Specify the resource name for the data provider.
-  //   ids: result?.partner_id ? [result.partner_id] : [], // Pass an empty array if no ID, rather than `[""]`.
-  //   queryOptions: {
-  //     enabled: !!result?.partner_id && data?.can, // Query is enabled only if `partner_id` exists.
-  //   }
-  // });
-
-  // const partner = partnersData?.data?.[0];
 
   return (
     <CanAccess resource="deposit" action="show" fallback={<Notfound />}>
@@ -63,56 +49,38 @@ export function DepositShow() {
           <div className="grid grid-cols-1 sm:grid-cols-2">
             <div className="flex flex-col gap-3">
               <FieldOrderDetail label="Order No:" value={result?.id} />
-              <FieldOrderDetail
-                label="CVPay Order No:"
-                value={result?.body?.payOrderId}
-              />
-              <FieldOrderDetail
-                label="Partner:"
-                value={
-                  result?.partner_id
-                }
-              />
+              <FieldOrderDetail label="CVPay Order No:" value={result?.body?.payOrderId} />
+              <FieldOrderDetail label="Partner:" value={result?.partner_id} />
               <FieldOrderDetail
                 label="Create time:"
-                value={
-                  result
-                    ? dayjs(result.created_at.seconds * 1000).format(
-                        "DD/MM/YYYY HH:mm"
-                      )
-                    : null
-                }
+                value={result ? dayjs(result.created_at.seconds * 1000).format("DD/MM/YYYY HH:mm") : null}
               />
               <FieldOrderDetail
                 label="Update time:"
-                value={
-                  result
-                    ? dayjs(result.updated_at.seconds * 1000).format(
-                        "DD/MM/YYYY HH:mm"
-                      )
-                    : null
-                }
+                value={result ? dayjs(result.updated_at.seconds * 1000).format("DD/MM/YYYY HH:mm") : null}
               />
               <FieldOrderDetail
                 label="Expired time:"
-                value={
-                  result
-                    ? dayjs(result.expired_at.seconds * 1000).format(
-                        "DD/MM/YYYY HH:mm"
-                      )
-                    : null
-                }
+                value={result ? dayjs(result.expired_at.seconds * 1000).format("DD/MM/YYYY HH:mm") : null}
               />
 
               <FieldOrderDetail label="Payment method:" value={"VietQR"} />
-              {/* <FieldOrderDetail label="Refund times:" value={""} />
-              <FieldOrderDetail label="Refund amount:" value={""} /> */}
+           
               <FieldOrderDetailStatus
                 label="Status:"
                 value={
-                  getStatus2(result?.state) ? (
-                    <Tag color={getColorStatus2(result?.state)}>
-                      {getStatus2(result?.state)}
+                  getLabelOrderStatus(result?.state) ? (
+                    <Tag color={getLabelColorOrderStatus(result?.state)}>{getLabelOrderStatus(result?.state)}</Tag>
+                  ) : undefined
+                }
+              />
+
+              <FieldOrderDetailStatus
+                label="Processing Status:"
+                value={
+                  getLabelProcessingState(result?.processing_state) ? (
+                    <Tag color={getLabelColorProcessingState(result?.processing_state)}>
+                      {getLabelProcessingState(result?.processing_state)}
                     </Tag>
                   ) : undefined
                 }
@@ -122,17 +90,10 @@ export function DepositShow() {
             <div className="flex flex-col gap-3 mt-4">
               <FieldOrderDetail
                 label="Rate:"
-                value={
-                  result?.rate
-                    ? `${formatDisplay(Number(result.rate), {})} VND`
-                    : null
-                }
+                value={result?.rate ? `${formatDisplay(Number(result.rate), {})} VND` : null}
               />
 
-              <FieldOrderDetail
-                label="Network:"
-                value={getNameChainById(result?.chain_id)}
-              />
+              <FieldOrderDetail label="Network:" value={getNameChainById(result?.chain_id)} />
 
               <FieldOrderDetail
                 label="TX Hash:"
@@ -161,19 +122,11 @@ export function DepositShow() {
               />
               <FieldOrderDetail
                 label="Total Payment:"
-                value={
-                  result?.amount
-                    ? `${formatDisplay(Number(result.amount), {})} VND`
-                    : null
-                }
+                value={result?.amount ? `${formatDisplay(Number(result.amount), {})} VND` : null}
               />
               <FieldOrderDetail
                 label="Amount Received"
-                value={
-                  result?.outcome
-                    ? `${formatDisplay(Number(result?.outcome), {})} USDT`
-                    : null
-                }
+                value={result?.outcome ? `${formatDisplay(Number(result?.outcome), {})} USDT` : null}
               />
               <FieldOrderDetail label="Client IP:" value={result?.client_ip} />
             </div>
@@ -184,18 +137,9 @@ export function DepositShow() {
                 Payment Info
               </Typography.Title>
               <div className="flex flex-col gap-2">
-                <FieldOrderDetail
-                  label="Account number:"
-                  value={result?.payment_info.account_number}
-                />
-                <FieldOrderDetail
-                  label="Account name:"
-                  value={result?.payment_info.full_name}
-                />
-                <FieldOrderDetail
-                  label="Bank name:"
-                  value={bankInfo?.short_name}
-                />
+                <FieldOrderDetail label="Account number:" value={result?.payment_info.account_number} />
+                <FieldOrderDetail label="Account name:" value={result?.payment_info.full_name} />
+                <FieldOrderDetail label="Bank name:" value={bankInfo?.short_name} />
               </div>
             </Flex>
           ) : null}
